@@ -1,0 +1,1 @@
+https://docs.python.jp/3/tutorial/interpreter.html
