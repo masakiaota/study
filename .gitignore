@@ -104,3 +104,6 @@ venv.bak/
 .mypy_cache/
 .DS_Store
 mnist-original.mat
+
+# 無視するデータのファイル
+matuolab/weblab_dlb/MNIST_data/*.gz
