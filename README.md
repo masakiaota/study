@@ -10,6 +10,9 @@
 #### matuolab
 松尾研究室が公開しているもの。
 
+#### my_cheatsheet
+よく使う操作をスニペット形式で管理する
+
 http://weblab.t.u-tokyo.ac.jp/演習コンテンツ公開ページ/
 
 役立ちそうな参考 https://qiita.com/tomo_makes/items/5d6f5860bb793e3b354a
