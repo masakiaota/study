@@ -110,4 +110,4 @@ mnist-original.mat
 # 無視するデータのファイル
 matuolab/weblab_dlb/MNIST_data/*.gz
 study_env/*
-tutorial/pytorch/data
+tutorial/pytorch/60_minute_blitz/data
