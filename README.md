@@ -24,3 +24,6 @@ http://weblab.t.u-tokyo.ac.jp/演習コンテンツ公開ページ/
 ソースコードはいろいろなところから持ってきているが特にここからの出典がおおいので念のために明記しておく
 
 https://github.com/jakevdp/PythonDataScienceHandbook/tree/be23269c7eb119e093a6d5ce91e464f5e686d9ab
+
+### news_categorize
+ニュース記事を階層的に分類したい。
