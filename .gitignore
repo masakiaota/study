@@ -112,3 +112,4 @@ matuolab/weblab_dlb/MNIST_data/*.gz
 study_env/*
 tutorial/pytorch/60_minute_blitz/data
 tutorial/pytorch/data
+news_categorize/data
