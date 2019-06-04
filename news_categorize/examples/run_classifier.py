@@ -208,7 +208,10 @@ class ColaProcessor(DataProcessor):
 
 
 class Sst2Processor(DataProcessor):
-    """Processor for the SST-2 data set (GLUE version)."""
+    """
+    Processor for the SST-2 data set (GLUE version).
+    ここでInputExampleのリストも作ってしまっている。
+    """
 
     def get_train_examples(self, data_dir):
         """See base class."""
@@ -728,6 +731,7 @@ def main():
         raise ValueError("Task not found: %s" % (task_name))
 
     processor = processors[task_name]()
+    # processorで前処理してる→してる
     output_mode = output_modes[task_name]
 
     label_list = processor.get_labels()
@@ -738,9 +742,11 @@ def main():
     train_examples = None
     num_train_optimization_steps = None
     if args.do_train:
-        train_examples = processor.get_train_examples(args.data_dir)
+        train_examples = processor.get_train_examples(args.data_dir)  # ここでInputExampleのリストを返している。
+
         num_train_optimization_steps = int(
             len(train_examples) / args.train_batch_size / args.gradient_accumulation_steps) * args.num_train_epochs
+        
         if args.local_rank != -1:
             num_train_optimization_steps = num_train_optimization_steps // torch.distributed.get_world_size()
 
@@ -748,9 +754,11 @@ def main():
     cache_dir = args.cache_dir if args.cache_dir else os.path.join(str(PYTORCH_PRETRAINED_BERT_CACHE), 'distributed_{}'.format(args.local_rank))
     model = BertForSequenceClassification.from_pretrained(args.bert_model,
               cache_dir=cache_dir,
-              num_labels=num_labels)
+              num_labels=num_labels)  #こんなクラスもあるのか
+
     if args.fp16:
         model.half()
+        # 16bit精度にしてる。
     model.to(device)
     if args.local_rank != -1:
         try:
@@ -759,8 +767,12 @@ def main():
             raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use distributed and fp16 training.")
 
         model = DDP(model)
+        #DDPとはなにか
+
+
     elif n_gpu > 1:
         model = torch.nn.DataParallel(model)
+
 
     # Prepare optimizer
     if args.do_train:
@@ -775,6 +787,7 @@ def main():
                 from apex.optimizers import FP16_Optimizer
                 from apex.optimizers import FusedAdam
             except ImportError:
+                # apex A Python EXtentionというライブラリがあって
                 raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use distributed and fp16 training.")
 
             optimizer = FusedAdam(optimizer_grouped_parameters,
@@ -789,17 +802,23 @@ def main():
                                                  t_total=num_train_optimization_steps)
 
         else:
+            # apexがなくてもoptimizerは存在する。
             optimizer = BertAdam(optimizer_grouped_parameters,
                                  lr=args.learning_rate,
                                  warmup=args.warmup_proportion,
                                  t_total=num_train_optimization_steps)
 
+
     global_step = 0
     nb_tr_steps = 0
     tr_loss = 0
+
     if args.do_train:
+        # ここがfinetuneの本処理かな
+
         train_features = convert_examples_to_features(
             train_examples, label_list, args.max_seq_length, tokenizer, output_mode)
+
         logger.info("***** Running training *****")
         logger.info("  Num examples = %d", len(train_examples))
         logger.info("  Batch size = %d", args.train_batch_size)
@@ -808,10 +827,12 @@ def main():
         all_input_mask = torch.tensor([f.input_mask for f in train_features], dtype=torch.long)
         all_segment_ids = torch.tensor([f.segment_ids for f in train_features], dtype=torch.long)
 
+
         if output_mode == "classification":
             all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.long)
         elif output_mode == "regression":
             all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.float)
+
 
         train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
         if args.local_rank == -1:
@@ -820,7 +841,8 @@ def main():
             train_sampler = DistributedSampler(train_data)
         train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=args.train_batch_size)
 
-        model.train()
+        model.train()  #train modeにセット
+
         for _ in trange(int(args.num_train_epochs), desc="Epoch"):
             tr_loss = 0
             nb_tr_examples, nb_tr_steps = 0, 0

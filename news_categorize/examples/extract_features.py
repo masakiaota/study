@@ -31,9 +31,9 @@ from torch.utils.data.distributed import DistributedSampler
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.modeling import BertModel
 
-logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s', 
-                    datefmt = '%m/%d/%Y %H:%M:%S',
-                    level = logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
+                    datefmt='%m/%d/%Y %H:%M:%S',
+                    level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -132,8 +132,10 @@ def convert_examples_to_features(examples, seq_length, tokenizer):
             logger.info("*** Example ***")
             logger.info("unique_id: %s" % (example.unique_id))
             logger.info("tokens: %s" % " ".join([str(x) for x in tokens]))
-            logger.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
-            logger.info("input_mask: %s" % " ".join([str(x) for x in input_mask]))
+            logger.info("input_ids: %s" %
+                        " ".join([str(x) for x in input_ids]))
+            logger.info("input_mask: %s" %
+                        " ".join([str(x) for x in input_mask]))
             logger.info(
                 "input_type_ids: %s" % " ".join([str(x) for x in input_type_ids]))
 
@@ -165,18 +167,22 @@ def _truncate_seq_pair(tokens_a, tokens_b, max_length):
 
 
 def read_examples(input_file):
-    """Read a list of `InputExample`s from an input file."""
+    """
+    Read a list of `InputExample`s from an input file.
+    ファイルを一行一行とかの読み込んでいくやつ
+    """
     examples = []
     unique_id = 0
     with open(input_file, "r", encoding='utf-8') as reader:
+        # 各行が1サンプルだとして読み込んでいる。
         while True:
             line = reader.readline()
             if not line:
                 break
-            line = line.strip()
+            line = line.strip()  # 単語ごとに分割
             text_a = None
             text_b = None
-            m = re.match(r"^(.*) \|\|\| (.*)$", line)
+            m = re.match(r"^(.*) \|\|\| (.*)$", line)  # 次にこの文が来るか否かを判定する用のやつ
             if m is None:
                 text_a = line
             else:
@@ -184,6 +190,7 @@ def read_examples(input_file):
                 text_b = m.group(2)
             examples.append(
                 InputExample(unique_id=unique_id, text_a=text_a, text_b=text_b))
+            # 文章に付加情報を追加したクラスをappendしていっている。
             unique_id += 1
     return examples
 
@@ -191,24 +198,26 @@ def read_examples(input_file):
 def main():
     parser = argparse.ArgumentParser()
 
-    ## Required parameters
+    # Required parameters
     parser.add_argument("--input_file", default=None, type=str, required=True)
     parser.add_argument("--output_file", default=None, type=str, required=True)
     parser.add_argument("--bert_model", default=None, type=str, required=True,
                         help="Bert pre-trained model selected in the list: bert-base-uncased, "
                              "bert-large-uncased, bert-base-cased, bert-base-multilingual, bert-base-chinese.")
 
-    ## Other parameters
-    parser.add_argument("--do_lower_case", action='store_true', help="Set this flag if you are using an uncased model.")
+    # Other parameters
+    parser.add_argument("--do_lower_case", action='store_true',
+                        help="Set this flag if you are using an uncased model.")
     parser.add_argument("--layers", default="-1,-2,-3,-4", type=str)
     parser.add_argument("--max_seq_length", default=128, type=int,
                         help="The maximum total input sequence length after WordPiece tokenization. Sequences longer "
-                            "than this will be truncated, and sequences shorter than this will be padded.")
-    parser.add_argument("--batch_size", default=32, type=int, help="Batch size for predictions.")
+                        "than this will be truncated, and sequences shorter than this will be padded.")
+    parser.add_argument("--batch_size", default=32, type=int,
+                        help="Batch size for predictions.")
     parser.add_argument("--local_rank",
                         type=int,
                         default=-1,
-                        help = "local_rank for distributed training on gpus")
+                        help="local_rank for distributed training on gpus")
     parser.add_argument("--no_cuda",
                         action='store_true',
                         help="Whether not to use CUDA when available")
@@ -216,27 +225,33 @@ def main():
     args = parser.parse_args()
 
     if args.local_rank == -1 or args.no_cuda:
-        device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+        device = torch.device(
+            "cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
         n_gpu = torch.cuda.device_count()
     else:
         device = torch.device("cuda", args.local_rank)
         n_gpu = 1
         # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
         torch.distributed.init_process_group(backend='nccl')
-    logger.info("device: {} n_gpu: {} distributed training: {}".format(device, n_gpu, bool(args.local_rank != -1)))
+    logger.info("device: {} n_gpu: {} distributed training: {}".format(
+        device, n_gpu, bool(args.local_rank != -1)))
 
-    layer_indexes = [int(x) for x in args.layers.split(",")]
+    layer_indexes = [int(x) for x in args.layers.split(",")]  # レイヤー取得
 
-    tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
+    tokenizer = BertTokenizer.from_pretrained(
+        args.bert_model, do_lower_case=args.do_lower_case)
 
-    examples = read_examples(args.input_file)
+    examples = read_examples(args.input_file)  # ここで入力ファイルを読み込んでいる
+    # 出力InputExampleクラスを格納したリスト
 
     features = convert_examples_to_features(
         examples=examples, seq_length=args.max_seq_length, tokenizer=tokenizer)
+    # 出力InputFeaturesクラスを格納したリスト(ここではすでに、idに変換されている)
 
     unique_id_to_feature = {}
     for feature in features:
         unique_id_to_feature[feature.unique_id] = feature
+    # ここがなんで必要なのかわからない
 
     model = BertModel.from_pretrained(args.bert_model)
     model.to(device)
@@ -247,25 +262,33 @@ def main():
     elif n_gpu > 1:
         model = torch.nn.DataParallel(model)
 
-    all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
-    all_input_mask = torch.tensor([f.input_mask for f in features], dtype=torch.long)
+    all_input_ids = torch.tensor(
+        [f.input_ids for f in features], dtype=torch.long)
+    all_input_mask = torch.tensor(
+        [f.input_mask for f in features], dtype=torch.long)
     all_example_index = torch.arange(all_input_ids.size(0), dtype=torch.long)
 
     eval_data = TensorDataset(all_input_ids, all_input_mask, all_example_index)
+    # pytorchのテンサーデータセットが何か少し気になるわね。
     if args.local_rank == -1:
         eval_sampler = SequentialSampler(eval_data)
     else:
         eval_sampler = DistributedSampler(eval_data)
-    eval_dataloader = DataLoader(eval_data, sampler=eval_sampler, batch_size=args.batch_size)
+    eval_dataloader = DataLoader(
+        eval_data, sampler=eval_sampler, batch_size=args.batch_size)
+    # ココらへんはpytorch の使い方になれないと行けなさそうですね。
 
     model.eval()
     with open(args.output_file, "w", encoding='utf-8') as writer:
+        # 一行ずつファイルに書き込んでいる。
         for input_ids, input_mask, example_indices in eval_dataloader:
             input_ids = input_ids.to(device)
             input_mask = input_mask.to(device)
 
-            all_encoder_layers, _ = model(input_ids, token_type_ids=None, attention_mask=input_mask)
+            all_encoder_layers, _ = model(
+                input_ids, token_type_ids=None, attention_mask=input_mask)
             all_encoder_layers = all_encoder_layers
+            # ここのコード意味わかりませんが...
 
             for b, example_index in enumerate(example_indices):
                 feature = features[example_index.item()]
@@ -277,7 +300,8 @@ def main():
                 for (i, token) in enumerate(feature.tokens):
                     all_layers = []
                     for (j, layer_index) in enumerate(layer_indexes):
-                        layer_output = all_encoder_layers[int(layer_index)].detach().cpu().numpy()
+                        layer_output = all_encoder_layers[int(
+                            layer_index)].detach().cpu().numpy()
                         layer_output = layer_output[b]
                         layers = collections.OrderedDict()
                         layers["index"] = layer_index
