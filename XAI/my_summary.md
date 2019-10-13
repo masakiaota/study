@@ -2,6 +2,9 @@
 - サーベイ論文(長くて読んでない) https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8466590
 - 参考になりそうなサイト(導入としてこちらから) https://towardsdatascience.com/human-interpretable-machine-learning-part-1-the-need-and-importance-of-model-interpretation-2ed758f5f476
 
+- めっちゃまとまってそうな本 https://christophm.github.io/interpretable-ml-book/
+
+- まとめっていそうな日本語の資料 https://www.slideshare.net/SatoshiHara3/ss-126157179
 
 ## 実装
 - Skater https://github.com/oracle/Skater
@@ -46,15 +49,34 @@
     - 参考 https://linus-mk.hatenablog.com/entry/2018/10/07/222909
 - Global Surrogate Models
     - 複雑なモデルを解釈可能ぐらい簡単なモデルに近似させる
-    - 例えば訓練済みXGboostを用いて、同じ入出力をするようにDTを学習する。
+    - 例えば訓練済みXGboostを用いて、同じ入出力をするようにDTを学習する。(born again treesというらしい)
 - Local Interpretable Model-agnostic Explanations (LIME)
-    - 
+    - サンプルに対してローカルの解釈を与える手法
+    - ブラックボックスに対して適応可能(SVM,NN,RF等)
+    - 論文 https://arxiv.org/abs/1602.04938
+    - 実装 https://github.com/marcotcr/lime 
+    - 説明したサンプルに対して摂動を加えたデータセットを用意してblackboxに推論させる。そしてその入出力を真似するように、線形のローカルモデルを訓練して係数を出力するという仕組み。
+
 - Shapley Values and SHapley Additive exPlanations (SHAP)
-    - 
+    - これも任意のモデルに適応できるみたい。
+    - ローカルの説明にゲーム理論と関連しているらしい？Shaply valueってやつ
+    - 論文 http://papers.nips.cc/paper/7062-a-unified-approach-to-interpreting-model-predictions
+    - モデル推論において特徴量をゲームのplayerと見立てている
+    - そのサンプルの特徴量がyの平均に対してどのように作用してその値になったのか説明しようという試み。
+    - **んーゲーム理論の下りがよくわからない**
+    - これの28pから説明がある https://www.slideshare.net/SatoshiHara3/ss-126157179
+    - こっちのほうがわかりやすいかも https://speakerdeck.com/hightensan/lime-and-shap-ji-jie-xue-xi-moderuniyoruyu-ce-jie-guo-falseshuo-ming-xing?slide=22
+    - http://www.ie110704.net/2019/04/26/機械学習モデルを解釈する指標shapについて/
+    - http://tmitani-tky.hatenablog.com/entry/2019/02/17/235409
+
 - ANCHORS
-    - 
+    - 実装 https://github.com/marcotcr/anchor
+    - 論文 https://www.aaai.org/ocs/index.php/AAAI/AAAI18/paper/view/16982
 
-
+- influence
+    - 予測の根拠となった訓練データを提示する方法
+    - 論文 http://proceedings.mlr.press/v70/koh17a.html
+    - 実装 https://github.com/kohpangwei/influence-release
 
 
 
