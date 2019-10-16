@@ -10,6 +10,8 @@
 - Skater https://github.com/oracle/Skater
 - ELI5 https://github.com/TeamHG-Memex/eli5
 - SHAP https://github.com/slundberg/shap
+- LIME https://github.com/marcotcr/lime 
+
 
 ## モチベーション
 「どうすればあなたのモデルを信用できますか?」や「あなたのモデルは実際にどのように意思決定を行うのだろうか。｣という質問に答えたい。
