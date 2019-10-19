@@ -67,9 +67,8 @@
     - そのサンプルの特徴量がyの平均に対してどのように作用してその値になったのか説明しようという試み。
     - **んーゲーム理論の下りがよくわからない**
     - これの28pから説明がある https://www.slideshare.net/SatoshiHara3/ss-126157179
-    - こっちのほうがわかりやすいかも https://speakerdeck.com/hightensan/lime-and-shap-ji-jie-xue-xi-moderuniyoruyu-ce-jie-guo-falseshuo-ming-xing?slide=22
     - http://www.ie110704.net/2019/04/26/機械学習モデルを解釈する指標shapについて/
-    - http://tmitani-tky.hatenablog.com/entry/2019/02/17/235409
+    - paperを読んだ人がわかりやすく整理してくれてる https://github.com/yoheikikuta/paper-reading/issues/17
 
 - ANCHORS
     - 実装 https://github.com/marcotcr/anchor
