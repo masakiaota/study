@@ -115,3 +115,4 @@ tutorial/pytorch/data
 news_categorize/data
 news_categorize/.vscode
 .vscode
+tutorial/apache_airflow/logs
