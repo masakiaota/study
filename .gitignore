@@ -116,3 +116,4 @@ news_categorize/data
 news_categorize/.vscode
 .vscode
 tutorial/apache_airflow/logs
+ml_design_book/ch02/open_bandit_dataset/*
