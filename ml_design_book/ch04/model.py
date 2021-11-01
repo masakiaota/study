@@ -4,9 +4,10 @@ from typing import Tuple
 from torch import nn, FloatTensor
 
 
+# unsafe_hashはまだ完全に理解できないけどdataclassは便利そうなので使っていこう
 @dataclass(unsafe_hash=True)
 class MLPScoreFunc(nn.Module):
-    """多層パーセプトロンによるスコアリング関数.
+    """多層パーセプトロンによるスコアリング関数.u
 
     パラメータ
     ----------
@@ -37,6 +38,7 @@ class MLPScoreFunc(nn.Module):
         self.output = nn.Linear(self.hidden_layer_sizes[-1], 1)
 
     def forward(self, x: FloatTensor) -> FloatTensor:
+        '''f_{\phi}に相当する関数を返す。スコアは確率的にはまだなっていない'''
         h = x
         for layer in self.hidden_layers:
             h = self.activation_func(layer(h))

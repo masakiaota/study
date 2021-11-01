@@ -67,8 +67,8 @@ def train_ranker(
         pow_used = pow_true
 
     ndcg_score_list = list()
-    for _ in tqdm(range(n_epochs)):
-        loader = DataLoader(
+    for _ in tqdm(range(n_epochs)): #P228のものに対応
+        loader = DataLoader( #DataLoaderって毎回epochで作っておくもんだっけ！？！？？？？
             train,
             batch_size=batch_size,
             shuffle=True,
@@ -81,9 +81,12 @@ def train_ranker(
                     relevance=batch.relevance, pow_true=pow_true, pow_used=pow_used
                 )
                 loss = listwise_loss(
-                    scores=score_fn(batch.features), click=click, num_docs=batch.n
+                    scores=score_fn(batch.features),
+                    click=click,
+                    num_docs=batch.n
+                    # ポジションバイアスを考慮しない
                 )
-            elif estimator == "ips":
+            elif estimator == "ips": #
                 click, theta = convert_gamma_to_implicit(
                     relevance=batch.relevance, pow_true=pow_true, pow_used=pow_used
                 )
@@ -91,10 +94,10 @@ def train_ranker(
                     scores=score_fn(batch.features),
                     click=click,
                     num_docs=batch.n,
-                    pscore=theta,
+                    pscore=theta, #ポジションバイアスの逆比を考慮
                 )
             elif estimator == "ideal":
-                gamma = convert_rel_to_gamma(relevance=batch.relevance)
+                gamma = convert_rel_to_gamma(relevance=batch.relevance) #真のデータを与えておく
                 loss = listwise_loss(
                     scores=score_fn(batch.features), click=gamma, num_docs=batch.n
                 )

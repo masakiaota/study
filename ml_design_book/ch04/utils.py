@@ -2,6 +2,7 @@ from typing import Tuple
 
 from torch import LongTensor, FloatTensor, arange, bernoulli
 
+#P223 の人工データの再現
 
 def convert_rel_to_gamma(
     relevance: LongTensor, max_rel_value: int = 4, eps: float = 0.1
@@ -14,7 +15,7 @@ def convert_rel_to_gamma(
     return gamma
 
 
-def convert_gamma_to_implicit(
+def convert_gamma_to_implicit( # 
     relevance: LongTensor,
     pow_true: float = 1.0,
     pow_used: float = 1.0,

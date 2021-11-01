@@ -3,12 +3,13 @@ from typing import Optional
 from torch import ones, FloatTensor
 from torch.nn.functional import log_softmax
 
+#P227の損失関数を実装
 
 def listwise_loss(
     scores: FloatTensor,  # f_{\phi}(u,i)
     click: FloatTensor,  # CTR(u,i,k)
     num_docs: FloatTensor,
-    pscore: Optional[FloatTensor] = None,  # \theta(k)
+    pscore: Optional[FloatTensor] = None,  # \theta(k) #これがポジションバイアス
 ) -> FloatTensor:
     """リストワイズ損失.
 
@@ -30,7 +31,7 @@ def listwise_loss(
     if pscore is None:
         pscore = ones(click.shape[1])
     listwise_loss = 0
-    for scores_, click_, num_docs_ in zip(scores, click, num_docs):
+    for scores_, click_, num_docs_ in zip(scores, click, num_docs): #iteratorの変数にアンスコつけるのもいいな #jのsumに対応
         listwise_loss_ = (click_ / pscore) * log_softmax(scores_, dim=0)
-        listwise_loss -= listwise_loss_[:num_docs_].sum()
+        listwise_loss -= listwise_loss_[:num_docs_].sum() #これ何やってるんだ... #考慮する個数だけでsum?して引いてる？
     return listwise_loss / len(scores)
